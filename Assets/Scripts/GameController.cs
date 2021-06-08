@@ -32,6 +32,7 @@ namespace CommandPattern.RebinKeys
         }
         private void Update()
         {
+            Debug.LogError("Test");
             if (isReplaying)
             {
                 return;
