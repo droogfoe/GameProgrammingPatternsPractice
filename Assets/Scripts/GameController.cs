@@ -8,14 +8,50 @@ namespace CommandPattern.RebinKeys
     {
         public InputCommander inputCommonder;
 
-        private Command rightCommand;  
-        private Command leftCommand;
-        private Command upCommand;
-        private Command downCommand;
+        [System.Serializable]
+        public class KeyInputBinding
+        {
+            public KeyCode key;
+            public InputCommand command;
+        }
+
+        public List<KeyInputBinding> keyInputCommands;
 
         private Stack<Command> undoCommands = new Stack<Command>();
         private Stack<Command> redoCommands = new Stack<Command>();
 
-        //private 
+        private bool isReplaying = false;
+
+        private void Start()
+        {
+            for (int i = 0; i < keyInputCommands.Count; i++)
+            {
+                keyInputCommands[i].command = new InputCommand(inputCommonder);
+            }
+        }
+        private void Update()
+        {
+            if (isReplaying)
+            {
+                return;
+            }
+            for (int i = 0; i < keyInputCommands.Count; i++)
+            {
+                KeyInputBinding currentKeyBing = keyInputCommands[i];
+                if (Input.GetKeyDown(currentKeyBing.key))
+                {
+                    ExcuteNewCommand(currentKeyBing.command);
+                    break;
+                }
+            }
+
+        }
+
+        private void ExcuteNewCommand(Command _command)
+        {
+            _command.Execute();
+            undoCommands.Push(_command);
+            redoCommands.Clear(); //Remove all redo commands redo is note defined when having a new command.
+        }
     }
 }
